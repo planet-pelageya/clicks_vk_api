@@ -37,6 +37,7 @@ def count_clicks(access_token, url):
         "access_token": access_token,
         "v": api_version,
         "key": key
+        "interval":"forever"
     }
     response = requests.get(link_info, params = params)
     if response.status_code == 200:
