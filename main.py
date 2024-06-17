@@ -57,6 +57,7 @@ def is_shorten_link(url,access_token):
 
 
 if __name__ == '__main__':
+    print("Введите ссылку")
     is_shorten_link(url,access_token)
 
 
