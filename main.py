@@ -3,61 +3,61 @@ import urllib.parse
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
-access_token = os.getenv("access_token")
-access_token = '8ca4df288ca4df288ca4df284c8fbc47c388ca48ca4df28eac3e3d2779f4d335be97f67'
-get_short_link = "https://api.vk.com/method/utils.getShortLink"
-link_info = "https://api.vk.com/method/utils.getLinkStats"
-url = input()
-api_version = "5.199"
-short_link_marker = 'vk.cc'
-def shorten_link(access_token, url):
+
+SHORT_LINK_METHOD = "https://api.vk.com/method/utils.getShortLink"
+lINK_INFO_METHOD = "https://api.vk.com/method/utils.getLinkStats"
+API_VERSION = "5.199"
+SHORT_LINK_MARKER = 'vk.cc'
+def shorten_link( url, ACCESS_TOKEN):
     params = {
-        "access_token": access_token,
-        "v": api_version,
+        "access_token": ACCESS_TOKEN,
+        "v": API_VERSION,
         "url": url
     }
-    response = requests.get(get_short_link, params=params)
-    if response.status_code == 200:
+    response = requests.get(SHORT_LINK_METHOD, params=params)
+    if response.ok:
         short_url = response.json()
         if "error" in short_url:
             error_message = short_url["error"]["error_code"]
-            print(error_message)
+            return f"Ошибка: {error_message}"
         else:
-            print(short_url["response"]['short_url'])
             return short_url["response"]['short_url']
     else:
-        print (f"Ошибка: {response.status_code}")
-def count_clicks(access_token, url):
+        return f"Ошибка: {response.status_code}"
+def count_clicks(ACCESS_TOKEN, url):
     parsed_url = urllib.parse.urlparse(url)
-    path = parsed_url.path
-    parts = path.split('/')
-    key = parts[-1]
+    parts_of_link = parsed_url.path.split('/')
+    key = parts_of_link[-1]
     params = {
-        "access_token": access_token,
-        "v": api_version,
-        "key": key
+        "access_token": ACCESS_TOKEN,
+        "v": API_VERSION,
+        "key": key,
         "interval":"forever"
     }
-    response = requests.get(link_info, params = params)
-    if response.status_code == 200:
+    response = requests.get(lINK_INFO_METHOD, params = params)
+    if response.ok:
         response_json = response.json()
         if "error" in response_json:
             error_message = response_json["error"]["error_code"]
-            print(error_message)
+            print(f'Ошибка1 {error_message}')
         else:
-            print(response_json["response"]['stats'][0]["views"])
+            count_clicks = response_json["response"]['stats'][0]["views"]
+            print(f"количество кликов {count_clicks}")
     else:
         print(f"Ошибка: {response.status_code}")
-def is_shorten_link(url,access_token):
-    if short_link_marker in urllib.parse.urlparse(url).netloc:
-        count_clicks(access_token, url)
+
+
+def is_shorten_link(url, ACCESS_TOKEN):
+    if SHORT_LINK_MARKER in urllib.parse.urlparse(url).netloc:
+        count_clicks(ACCESS_TOKEN, url)
     else:
-        shorten_link(access_token, url)
+        shorten_link(ACCESS_TOKEN, url)
 
 
 if __name__ == '__main__':
-    print("Введите ссылку")
-    is_shorten_link(url,access_token)
+    url = input("введите ссылку ")
+    load_dotenv()
+    ACCESS_TOKEN = os.environ["ACCESS_TOKEN"]
+    count_clicks(url,ACCESS_TOKEN)
 
 
